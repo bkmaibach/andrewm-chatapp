@@ -14,16 +14,25 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user connected');
+    socket.emit('newMessage', {from:'Admin', text:'Welcome to the chat app'});
+    socket.broadcast.emit('newMessage', {from:'Admin', text:'New user joined'});
 
     socket.on('disconnect', (socket) => {
         console.log('Client disconnected');
     });
 
     socket.on('createMessage', (createdMessage) => {
-        console.log('createEmail', createdMessage)
+        console.log('createMessage', createdMessage)
         //socket.emit emits to a single conneection,
         // while io.emit emits to every single open connection
-        io.emit('newMessage', {
+        // io.emit('newMessage', {
+        //     from: createdMessage.from,
+        //     text: createdMessage.text,
+        //     createdAt: new Date().getTime()
+        // });
+
+        //Socket.broadcast emits to everyone but itself (socket)
+        socket.broadcast.emit('newMessage', {
             from: createdMessage.from,
             text: createdMessage.text,
             createdAt: new Date().getTime()
