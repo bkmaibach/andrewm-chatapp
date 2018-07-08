@@ -3,6 +3,8 @@ const express = require('express');
 const socketIO = require('socket.io');
 const http = require('http');
 
+const {generateMessage} = require('./utils/message.js');
+
 const publicPath = path.join(__dirname, '../public', );
 
 const app = express();
@@ -14,29 +16,19 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user connected');
-    socket.emit('newMessage', {from:'Admin', text:'Welcome to the chat app'});
-    socket.broadcast.emit('newMessage', {from:'Admin', text:'New user joined'});
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the Church, may peace and blessings be upon your scalp'));
+
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the realm'));
 
     socket.on('disconnect', (socket) => {
         console.log('Client disconnected');
     });
 
-    socket.on('createMessage', (createdMessage) => {
-        console.log('createMessage', createdMessage)
-        //socket.emit emits to a single conneection,
+    socket.on('createMessage', (message) => {
+        console.log('createMessage', message)
+        //socket.emit emits to a single connection,
         // while io.emit emits to every single open connection
-        // io.emit('newMessage', {
-        //     from: createdMessage.from,
-        //     text: createdMessage.text,
-        //     createdAt: new Date().getTime()
-        // });
-
-        //Socket.broadcast emits to everyone but itself (socket)
-        socket.broadcast.emit('newMessage', {
-            from: createdMessage.from,
-            text: createdMessage.text,
-            createdAt: new Date().getTime()
-        });
+        socket.broadcast.emit('newMessage', generateMessage(message.from, message.text));
     });
 });
 
