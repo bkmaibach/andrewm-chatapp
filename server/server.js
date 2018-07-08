@@ -4,6 +4,7 @@ const socketIO = require('socket.io');
 const http = require('http');
 
 const {generateMessage} = require('./utils/message.js');
+const {generateLocationMessage} = require('./utils/message.js');
 
 const publicPath = path.join(__dirname, '../public', );
 
@@ -16,7 +17,8 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user connected');
-    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the Church, may peace and blessings be upon your scalp'));
+    socket.emit('newMessage', generateMessage('Admin',
+     'Welcome to the Church, may peace and blessings rest upon your scalp'));
 
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the chat'));
 
@@ -30,6 +32,13 @@ io.on('connection', (socket) => {
         // while io.emit emits to every single open connection
         io.emit('newMessage', generateMessage(message.from, message.text));
         callback('Some data sent back from the server');
+    });
+
+    socket.on('createLocationMessage', (coords) => {
+        console.log('createLocationMessage', coords)
+        //socket.emit emits to a single connection,
+        // while io.emit emits to every single open connection
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 });
 
