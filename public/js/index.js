@@ -15,6 +15,26 @@ socket.on('disconnect', function(){
 });
 
 socket.on('newMessage', function(message){
-    console.log('New message received', message)
+    console.log('New message received', message);
+    //Use jQuery to CREATE an element!
+    var li = jQuery('<li></li>');
+    li.text(`${message.from}: ${message.text}`);
+
+    jQuery('#messages').append(li);
 });
 
+
+// socket.emit('createMessage', {from:'Frank', text:'Hi'}, function (ackData) {
+//     console.log('Acknowledged', ackData)
+// });
+
+jQuery('#message-form').on('submit', function (e) {
+    e.preventDefault();
+
+    socket.emit('createMessage', {
+        from: 'User',
+        text: jQuery('[name=message]').val()
+    }, function () {
+
+    });
+});
