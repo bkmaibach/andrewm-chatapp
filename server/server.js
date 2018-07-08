@@ -31,7 +31,8 @@ io.on('connection', (socket) => {
         //socket.emit emits to a single connection,
         // while io.emit emits to every single open connection
         io.emit('newMessage', generateMessage(message.from, message.text));
-        callback('Some data sent back from the server');
+        //In this case the callback actually tells the users message box to clear itself.
+        callback();
     });
 
     socket.on('createLocationMessage', (coords) => {
