@@ -15,33 +15,33 @@ socket.on('disconnect', function(){
 });
 
 socket.on('newMessage', function(message){
-    console.log('New message received', message);
+    // console.log('New message received', message);
     var formattedTime = moment(message.createdAt).format('h:mm a');
-    //Use jQuery to CREATE an element!
-    var li = jQuery('<li></li>');
-    var strong = jQuery('<h4></h4>');
-    strong.append(message.from);
-    //li.text(`${message.from} ${formattedTime}: ${message.text}`);
-    li.append(strong);
-    li.append(` ${formattedTime}: ${message.text}`);
 
-    jQuery('#messages').append(li);
+    var template = jQuery('#message-template').html();
+    var html = Mustache.render(template, {
+        text:message.text,
+        from: message.from,
+        createdAt: formattedTime
+    });
+
+    jQuery('#messages').append(html);
 });
 
 socket.on('newLocationMessage', function(message){
-    console.log('New location message received', message);
-    //Use jQuery to CREATE an element!
-    var li = jQuery('<li></li>');
-    var strong = jQuery('<h4></h4>');
-    strong.append(message.from);
-    var formattedTime = moment(message.createdAt).format(' h:mm a: ');
-    var a = jQuery('<a target="_blank">My current location</a>');
-    //How to set an attribute like the link href:
-    a.attr('href', message.url);
-    li.append(strong);
-    li.append(formattedTime)
-    li.append(a);
-    jQuery('#messages').append(li);
+    // console.log('New message received', message);
+    var formattedTime = moment(message.createdAt).format('h:mm a');
+
+    var template = jQuery('#location-message-template').html();
+    var html = Mustache.render(template,
+        {
+            url: message.url,
+            from: message.from,
+            createdAt: formattedTime
+        }
+    );
+
+    jQuery('#messages').append(html);
 });
 
 var messageTextBox = jQuery('[name=message]');
