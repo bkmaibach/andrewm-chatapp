@@ -7,7 +7,7 @@ describe('generateMessage', () => {
         var testMessage = generateMessage('tester1', 'Check one two, check check');
         expect(testMessage).toHaveProperty('from', 'tester1');
         expect(testMessage).toHaveProperty('text', 'Check one two, check check');
-        expect(testMessage.createdAt).toBeGreaterThan(1531070889);
+        expect(testMessage.createdAt).toBeGreaterThan(1531070889000);
     });
 });
 
@@ -16,6 +16,6 @@ describe('generateLocationMessage', () => {
         var testLocMessage = generateLocationMessage('tester1', 1, 1);
         expect(testLocMessage).toHaveProperty('from', 'tester1');
         expect(testLocMessage).toHaveProperty('url', `https://www.google.com/maps?q=1,1`,);
-        expect(testLocMessage.createdAt).toBeGreaterThan(1531070889);
+        expect(testLocMessage.createdAt).toBeGreaterThan(1531070889000);
     });
 });
