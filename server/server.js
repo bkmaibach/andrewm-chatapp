@@ -20,13 +20,20 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
 
+    //Some suggestions:
+    // Make room names case insensitive DONE
+    // make user names unique
+    // add a list of active rooms to the login screen
+    // add a top bar showing the room and user
+    // add user database support
+
 
     socket.on('join', (params, callback) => {
         if (!isRealString(params.name) || !isRealString(params.room)){
            return callback('Name and room name are required!');
         }
-
-        console.log(`New user joined room ${params.room}`);
+        params.room = params.room.toLowerCase();
+        console.log(`User ${params.name} joined room ${params.room}`);
         socket.emit('newMessage', generateMessage('Admin',
         'Welcome to the Church, may peace and blessings rest upon your scalp'));
         socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin',
