@@ -5,6 +5,7 @@ const http = require('http');
 
 const {generateMessage} = require('./utils/message.js');
 const {generateLocationMessage} = require('./utils/message.js');
+const {isRealString} = require('./utils/validation.js');
 
 const publicPath = path.join(__dirname, '../public', );
 
@@ -16,11 +17,33 @@ var io = socketIO(server);
 app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
-    console.log('New user connected');
-    socket.emit('newMessage', generateMessage('Admin',
-     'Welcome to the Church, may peace and blessings rest upon your scalp'));
 
-    socket.broadcast.emit('newMessage', generateMessage('Admin', 'A new user has joined the chat'));
+
+    socket.on('join', (params, callback) => {
+        if (!isRealString(params.name) || !isRealString(params.room)){
+            callback('Name and room name are required!');
+        }
+
+        console.log(`New user joined room ${params.room}`);
+        socket.emit('newMessage', generateMessage('Admin',
+        'Welcome to the Church, may peace and blessings rest upon your scalp'));
+        socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin',
+        `${params.name} has joined the chat`));
+
+        socket.join(params.room);
+        //socket.leave('Elite Developers');
+
+        //How do we emit events?
+        //io.emit() -> goes to everyone
+        //socket.broadcast.emit -> goes to everyone except socket
+        //socket.emit -> emit to one user
+
+        //What is the room counterpart? Introducing the 'to' method
+        //io.to('Elite Developers').emit -> emits to everyone in this room
+        //socket.broadcast.to('Elite Developers').emit -> send to everyone in a room except the socket
+        
+        callback();
+    });
 
     socket.on('disconnect', (socket) => {
         console.log('Client disconnected');

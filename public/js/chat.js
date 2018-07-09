@@ -20,10 +20,16 @@ function scrollToBottom(){
 
 socket.on('connect', function() {
     console.log('Connected to server');
-    // socket.emit('createMessage', {
-    //     from:'jeff@something.com',
-    //     text:"From a form, typically"
-    // });
+    var params = jQuery.deparam(window.location.search);
+
+    socket.emit('join', params, (error) => {
+        if (error){
+            alert(error);
+            window.location.href = '/'
+        } else {
+            console.log('Join successful')
+        }
+    });
 });
 
 socket.on('disconnect', function(){
