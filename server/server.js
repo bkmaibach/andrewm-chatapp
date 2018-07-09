@@ -64,7 +64,11 @@ io.on('connection', (socket) => {
         console.log('createMessage', message)
         //socket.emit emits to a single connection,
         // while io.emit emits to every single open connection
-        io.emit('newMessage', generateMessage(message.from, message.text));
+        var sender = users.getUser(socket.id);
+
+        if(sender && isRealString(message.text)){
+            io.to(sender.room).emit('newMessage', generateMessage(sender.name, message.text));
+        }
         //In this case the callback actually tells the users message box to clear itself.
         callback();
     });
@@ -73,7 +77,11 @@ io.on('connection', (socket) => {
         console.log('createLocationMessage', coords)
         //socket.emit emits to a single connection,
         // while io.emit emits to every single open connection
-        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
+        var sender = users.getUser(socket.id);
+        if(sender){
+            io.to(sender.room).emit('newLocationMessage',
+             generateLocationMessage(sender.name, coords.latitude, coords.longitude));
+        }
     });
 });
 

@@ -14,7 +14,6 @@ function scrollToBottom(){
 
     if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight){
         messages.scrollTop(scrollHeight);
-
     }
 }
 
@@ -48,7 +47,6 @@ socket.on('updateUserList', function(nameArray) {
 });
 
 socket.on('newMessage', function(message){
-    // console.log('New message received', message);
     var formattedTime = moment(message.createdAt).format('h:mm a');
 
     var template = jQuery('#message-template').html();
@@ -63,7 +61,6 @@ socket.on('newMessage', function(message){
 });
 
 socket.on('newLocationMessage', function(message){
-    // console.log('New message received', message);
     var formattedTime = moment(message.createdAt).format('h:mm a');
 
     var template = jQuery('#location-message-template').html();
@@ -84,7 +81,6 @@ var messageTextBox = jQuery('[name=message]');
 jQuery('#message-form').on('submit', function (e) {
     e.preventDefault();
     socket.emit('createMessage', {
-        from: 'User',
         text: messageTextBox.val()
     }, function () {
         messageTextBox.val('');
@@ -107,8 +103,9 @@ locationButton.on('click', function () {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
         })
-    }, function(){
+    }, function(err){
         locationButton.removeAttr('disabled').text('Send location');
-        alert('Unable to fetch location');
+        console.log(err);
+        alert(`Unable to fetch location: ${err}`);
     });
 });
