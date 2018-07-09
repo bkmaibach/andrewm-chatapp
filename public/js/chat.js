@@ -37,13 +37,13 @@ socket.on('disconnect', function(){
 
 socket.on('updateUserList', function(nameArray) {
     console.log('updateUserList with: ', nameArray);
-    var ol = jQuery('<ol></ol>');
+    var ul = jQuery('<ul></ul>');
     nameArray.forEach(name => {
-        ol.append(jQuery('<li></li>').text(name));
+        ul.append(jQuery('<li></li>').text(name));
     });
 
     //using .html instead of .append replaces the contents
-    jQuery('#users').html(ol);
+    jQuery('#users').html(ul);
 });
 
 socket.on('newMessage', function(message){
