@@ -3,6 +3,7 @@ const express = require('express');
 const socketIO = require('socket.io');
 const http = require('http');
 
+
 const {generateMessage} = require('./utils/message.js');
 const {generateLocationMessage} = require('./utils/message.js');
 const {isRealString} = require('./utils/validation.js');
@@ -26,13 +27,25 @@ io.on('connection', (socket) => {
     // add a list of active rooms to the login screen
     // add a top bar showing the room and user
     // add user database support
-
+    console.log('room list:', users.getRoomList());
 
     socket.on('join', (params, callback) => {
+
+
         if (!isRealString(params.name) || !isRealString(params.room)){
            return callback('Name and room name are required!');
+        } else if (users.getUserByName(params.name) != undefined){
+            return callback('This name has been taken, please choose a unique name');
         }
         params.room = params.room.toLowerCase();
+
+        var roomList = users.getRoomList();
+        var newRoom = ((roomList).filter((room) => room == params.room).length === 0);
+  
+        console.log('room list:', roomList);
+        console.log('params.room:', params.room);
+        console.log('newRoom:', newRoom);
+
         console.log(`User ${params.name} joined room ${params.room}`);
         socket.emit('newMessage', generateMessage('Admin',
         'Welcome to the Church, may peace and blessings rest upon your scalp'));
@@ -53,8 +66,16 @@ io.on('connection', (socket) => {
         users.removeUser(socket.id);
         //The user should be removed from any previous room before being added to this room.
         users.addUser(socket.id, params.name, params.room);
+
+        if(newRoom){
+            roomList.push(params.room)
+            console.log('emitting updateRoomList')
+            io.emit('updateRoomList', roomList);
+        }
         io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        
         callback();
+        
     });
 
     socket.on('disconnect', () => {
@@ -71,7 +92,7 @@ io.on('connection', (socket) => {
         console.log('createMessage', message)
         //socket.emit emits to a single connection,
         // while io.emit emits to every single open connection
-        var sender = users.getUser(socket.id);
+        var sender = users.getUserByID(socket.id);
 
         if(sender && isRealString(message.text)){
             io.to(sender.room).emit('newMessage', generateMessage(sender.name, message.text));
@@ -84,7 +105,7 @@ io.on('connection', (socket) => {
         console.log('createLocationMessage', coords)
         //socket.emit emits to a single connection,
         // while io.emit emits to every single open connection
-        var sender = users.getUser(socket.id);
+        var sender = users.getUserByID(socket.id);
         if(sender){
             io.to(sender.room).emit('newLocationMessage',
              generateLocationMessage(sender.name, coords.latitude, coords.longitude));

@@ -46,6 +46,15 @@ socket.on('updateUserList', function(nameArray) {
     jQuery('#users').html(ul);
 });
 
+socket.on('updateRoomList', function(roomArray) {
+    console.log('updateRoomList with: ', roomArray);
+    var ul = jQuery('<ul></ul>');
+    roomArray.forEach(room => {
+        ul.append(jQuery('<li></li>').text(room));
+    });
+    jQuery('#rooms').html(ul);
+});
+
 socket.on('newMessage', function(message){
     var formattedTime = moment(message.createdAt).format('h:mm a');
 
