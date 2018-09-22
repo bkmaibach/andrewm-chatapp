@@ -69,7 +69,7 @@ describe('Users', () => {
     });
 
     it('should find user', () => {
-        var user = testUsers.getUser(2);
+        var user = testUsers.getUserByID(2);
         expect(user).toEqual({
             id: 2,
             name: "Two",
@@ -78,7 +78,7 @@ describe('Users', () => {
     });
 
     it('should not find a non-existant user', () => {
-        var user = testUsers.getUser(4);
+        var user = testUsers.getUserByID(4);
         expect(user).toBeFalsy();
     });
 });

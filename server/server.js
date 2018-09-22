@@ -8,6 +8,7 @@ const {generateMessage} = require('./utils/message.js');
 const {generateLocationMessage} = require('./utils/message.js');
 const {isRealString} = require('./utils/validation.js');
 const {Users} = require('./utils/users.js')
+const twilio = require('./utils/twilio.js')
 
 const publicPath = path.join(__dirname, '../public', );
 
@@ -96,6 +97,15 @@ io.on('connection', (socket) => {
 
         if(sender && isRealString(message.text)){
             io.to(sender.room).emit('newMessage', generateMessage(sender.name, message.text));
+
+            if(sender.name.toLowerCase() == 'cardinal' && twilio.isPhone(sender.room)){
+                console.log('ENTERING TWILIO FUNCTION')
+                twilio.sendTwilioSms(sender.room, message.text).then(() => {
+                    console.log("Twilio promise resolved")
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }
         }
         //In this case the callback actually tells the users message box to clear itself.
         callback();
